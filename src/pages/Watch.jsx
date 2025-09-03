@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Hls from 'hls.js';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-vercel-server.vercel.app';
+
 const Watch = () => {
   const { id } = useParams();
   const [customUrl, setCustomUrl] = useState('');
@@ -34,6 +36,31 @@ const Watch = () => {
       }
     } catch {}
   }, [id]);
+
+  // Thêm polling kiểm tra trạng thái playback
+  useEffect(() => {
+    if (!customMeta?.assetId && !customMeta?.playbackId) return;
+    let interval;
+    const checkPlayback = async () => {
+      try {
+        const url = customMeta?.assetId
+          ? `${API_BASE_URL}/api/mux-playback-by-asset/${customMeta.assetId}`
+          : customMeta?.playbackId
+          ? `${API_BASE_URL}/api/mux-playback/${customMeta.playbackId}`
+          : null;
+        if (!url) return;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.playbackUrl) {
+          setCustomUrl(data.playbackUrl);
+        } else if (data.processing) {
+          // Asset chưa sẵn sàng, tiếp tục polling
+        }
+      } catch {}
+    };
+    interval = setInterval(checkPlayback, 4000);
+    return () => clearInterval(interval);
+  }, [customMeta]);
 
   useEffect(() => {
     if (!customUrl || !videoRef.current) return;

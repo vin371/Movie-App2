@@ -1,6 +1,7 @@
 // Movie Service để gọi API TMDB
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = import.meta.env.VITE_TMDB_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-vercel-server.vercel.app';
 
 // Hàm gọi API chung
 const fetchFromTMDB = async (endpoint) => {
