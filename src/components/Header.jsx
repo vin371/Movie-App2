@@ -179,6 +179,26 @@ const Header = () => {
                 Về Chúng tôi
               </Link>
             </li>
+            <li>
+              <Link
+                to="/upload"
+                style={{
+                  marginLeft: 16,
+                  fontWeight: 'bold',
+                  color: '#1976d2',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '10px 18px',
+                  borderRadius: '8px',
+                  transition: 'background 0.2s, color 0.2s, transform 0.2s',
+                }}
+                onMouseEnter={e => e.target.style.background = 'rgba(255,255,255,0.13)'}
+                onMouseLeave={e => e.target.style.background = 'transparent'}
+              >
+                Upload Video
+              </Link>
+            </li>
           </ul>
         </nav>
 

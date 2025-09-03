@@ -6,7 +6,6 @@ import { fallbackHotMovies } from '../data/movieData';
 
 const SearchResults = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
