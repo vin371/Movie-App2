@@ -271,9 +271,8 @@ function UploadPage() {
   // Hàm upload video lên Mux (với progress)
   const handleUpload = async (file) => {
     const formData = new FormData();
-    formData.append('video', file);
+    formData.append('video', file); // 'video' phải trùng với BE
 
-    console.log('Upload to:', `${API_BASE_URL}/api/mux-upload`);
     try {
       const res = await fetch(`${API_BASE_URL}/api/mux-upload`, {
         method: 'POST',
@@ -281,7 +280,6 @@ function UploadPage() {
       });
       const data = await res.json();
       console.log('Upload response:', data);
-      // Hiển thị lỗi nếu có
       if (data.error) alert('Upload lỗi: ' + data.error);
       else alert('Upload thành công: ' + data.filename);
     } catch (err) {
