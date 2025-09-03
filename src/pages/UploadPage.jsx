@@ -270,46 +270,20 @@ function UploadPage() {
 
   // Hàm upload video lên Mux (với progress)
   async function handleUpload(file) {
-    setUploading(true);
-    setProgress(0);
+    const formData = new FormData();
+    formData.append('video', file);
+
+    console.log('Upload to:', `${API_BASE_URL}/api/mux-upload`);
     try {
-      console.log('Upload to:', `${API_BASE_URL}/api/mux-upload`);
       const res = await fetch(`${API_BASE_URL}/api/mux-upload`, {
-        method: "POST",
+        method: 'POST',
+        body: formData,
       });
-      const { uploadUrl, uploadId } = await res.json();
-      if (!uploadUrl || !uploadId) {
-        console.log("Không nhận được uploadUrl hoặc uploadId từ backend:", {
-          uploadUrl,
-          uploadId,
-        });
-        setUploading(false);
-        return;
-      }
-
-      await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("PUT", uploadUrl, true);
-        xhr.setRequestHeader("Content-Type", "application/octet-stream");
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 100);
-            setProgress(percent);
-          }
-        };
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) resolve();
-          else reject(new Error(`Upload failed with status ${xhr.status}`));
-        };
-        xhr.onerror = () => reject(new Error("Network error during upload"));
-        xhr.send(file);
-      });
-
-      // Start polling using the uploadId returned by backend
-      pollPlaybackUrl(uploadId);
+      const data = await res.json();
+      console.log('Upload response:', data);
+      // Xử lý kết quả ở đây
     } catch (err) {
-      console.log("Lỗi upload video:", err);
-      setUploading(false);
+      console.error('Upload error:', err);
     }
   }
 
