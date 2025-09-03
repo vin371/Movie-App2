@@ -35,7 +35,7 @@ const VideoUpload = ({ onVideoUploaded }) => {
       setMessage("Video đã sẵn sàng để xem!");
       if (onVideoUploaded) onVideoUploaded(fileName, playbackUrl);
     } else {
-      setMessage("Video đang được xử lý trên Mux, vui lòng thử lại sau!");
+      setMessage("Video đang được xử lý trên Mux, vui lòng thử lại sau!!");
     }
   };
 
