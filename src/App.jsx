@@ -8,6 +8,7 @@ import Contact from './pages/Contact'
 import SearchResults from './pages/SearchResults'
 import MovieDetail from './pages/MovieDetail';
 import Watch from './pages/Watch'; // Nếu chưa có, bạn cần tạo file này
+import UploadPage from "./pages/UploadPage";
 
 function App() {
   const [hotMovies, setHotMovies] = useState([]);
@@ -19,7 +20,7 @@ function App() {
           method: 'GET',
           headers: {
             accept: 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`
+            Authorization: `Bearer ${import.meta.env.VITE_TMDB_API_KEY}`
           }
         };
         
@@ -71,7 +72,8 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/movie/:id" element={<MovieDetail />} />
-            <Route path="/watch/:id" element={<Watch />} /> {/* Thêm dòng này */}
+            <Route path="/watch/:id" element={<Watch />} />
+            <Route path="/upload" element={<UploadPage />} />
           </Routes>
         </main>
       </div>
