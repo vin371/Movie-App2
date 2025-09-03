@@ -269,7 +269,7 @@ function UploadPage() {
   };
 
   // Hàm upload video lên Mux (với progress)
-  async function handleUpload(file) {
+  const handleUpload = async (file) => {
     const formData = new FormData();
     formData.append('video', file);
 
@@ -281,9 +281,12 @@ function UploadPage() {
       });
       const data = await res.json();
       console.log('Upload response:', data);
-      // Xử lý kết quả ở đây
+      // Hiển thị lỗi nếu có
+      if (data.error) alert('Upload lỗi: ' + data.error);
+      else alert('Upload thành công: ' + data.filename);
     } catch (err) {
       console.error('Upload error:', err);
+      alert('Upload lỗi: ' + err.message);
     }
   }
 
