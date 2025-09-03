@@ -54,7 +54,7 @@ const VideoUpload = ({ onVideoUploaded }) => {
       const data = await res.json();
       if (!data.uploadUrl || !data.uploadId) throw new Error("Không lấy được upload URL!");
 
-      setMessage("Đang upload video lên Mux...");
+      setMessage("Đang upload video...");
       const xhr = new XMLHttpRequest();
       xhr.open("PUT", data.uploadUrl, true);
       xhr.setRequestHeader("Content-Type", "application/octet-stream");
