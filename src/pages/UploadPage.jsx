@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const TMDB_BASE_URL = import.meta.env.VITE_TMDB_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function UploadPage() {
   const [assetId, setAssetId] = useState("");
@@ -272,7 +273,7 @@ function UploadPage() {
     setUploading(true);
     setProgress(0);
     try {
-      const res = await fetch("http://localhost:5000/api/mux-upload", {
+      const res = await fetch(`${API_BASE_URL}/api/mux-upload`, {
         method: "POST",
       });
       const { uploadUrl, uploadId } = await res.json();
