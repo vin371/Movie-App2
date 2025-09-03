@@ -273,6 +273,7 @@ function UploadPage() {
     setUploading(true);
     setProgress(0);
     try {
+      console.log('Upload to:', `${API_BASE_URL}/api/mux-upload`);
       const res = await fetch(`${API_BASE_URL}/api/mux-upload`, {
         method: "POST",
       });
