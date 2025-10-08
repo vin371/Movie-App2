@@ -46,6 +46,25 @@ const MovieDetail = () => {
 
   // Modal xem phim
   const VideoModal = ({ open, onClose }) => {
+    // Tự động xoay màn hình khi mở modal video trên mobile
+    useEffect(() => {
+      if (open && window.screen.orientation && window.screen.orientation.lock) {
+        window.screen.orientation.lock("landscape").catch(() => {});
+      }
+      if (
+        !open &&
+        window.screen.orientation &&
+        window.screen.orientation.lock
+      ) {
+        window.screen.orientation.lock("portrait").catch(() => {});
+      }
+      // Khi unmount modal, trả về portrait
+      return () => {
+        if (window.screen.orientation && window.screen.orientation.lock) {
+          window.screen.orientation.lock("portrait").catch(() => {});
+        }
+      };
+    }, [open]);
     if (!open) return null;
     return (
       <div

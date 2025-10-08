@@ -50,10 +50,6 @@ const Header = () => {
     marginLeft: isMobile ? "2px" : "0",
     userSelect: "none",
   };
-  const logoIconStyles = {
-    fontSize: isMobile ? "1.3rem" : "1.7rem",
-    marginRight: "8px",
-  };
   const navListStyles = {
     listStyle: "none",
     display: "flex",
@@ -140,7 +136,6 @@ const Header = () => {
     <header style={headerStyles}>
       <div style={containerStyles}>
         <div style={logoStyles} onClick={handleLogoClick}>
-          <span style={logoIconStyles}>🎬</span>
           CPMV
         </div>
         {/* Toggle button for mobile - đẹp, nổi bật, không đè lên search */}
