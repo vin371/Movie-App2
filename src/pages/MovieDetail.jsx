@@ -34,7 +34,7 @@ const MovieDetail = () => {
   const handleOpenTrailer = async () => {
     const videos = await getMovieVideos(id);
     const trailer = videos.find(
-      (v) => v.site === "YouTube" && v.type === "Trailer"
+      (v) => v.site === "YouTube" && v.type === "Trailer!"
     );
     if (trailer) {
       setYoutubeKey(trailer.key);
