@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 
 const VideoUpload = ({ onVideoUploaded }) => {
   const [file, setFile] = useState(null);
@@ -8,7 +8,6 @@ const VideoUpload = ({ onVideoUploaded }) => {
   const [isUploaded, setIsUploaded] = useState(false);
   const [waitingMux, setWaitingMux] = useState(false);
   const [assetId, setAssetId] = useState("");
-  const pollingRef = useRef(null);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -23,7 +22,9 @@ const VideoUpload = ({ onVideoUploaded }) => {
     while (tries < 40 && !playbackUrl) {
       tries++;
       await new Promise((r) => setTimeout(r, 3000));
-      const res2 = await fetch(`http://localhost:5000/api/mux-playback/${uploadId}`);
+      const res2 = await fetch(
+        `http://localhost:5000/api/mux-playback/${uploadId}`
+      );
       const data2 = await res2.json();
       if (data2.playbackUrl) {
         playbackUrl = data2.playbackUrl;
@@ -52,7 +53,8 @@ const VideoUpload = ({ onVideoUploaded }) => {
         method: "POST",
       });
       const data = await res.json();
-      if (!data.uploadUrl || !data.uploadId) throw new Error("Không lấy được upload URL!");
+      if (!data.uploadUrl || !data.uploadId)
+        throw new Error("Không lấy được upload URL!");
 
       setMessage("Đang upload video...");
       const xhr = new XMLHttpRequest();
@@ -91,7 +93,9 @@ const VideoUpload = ({ onVideoUploaded }) => {
 
   const handleGetPlayback = async () => {
     if (!assetId) return;
-    const res = await fetch(`http://localhost:5000/api/mux-playback-by-asset/${assetId}`);
+    const res = await fetch(
+      `http://localhost:5000/api/mux-playback-by-asset/${assetId}`
+    );
     const data = await res.json();
     if (data.playbackUrl) {
       setMessage("Video đã sẵn sàng để xem!");
@@ -102,12 +106,28 @@ const VideoUpload = ({ onVideoUploaded }) => {
   };
 
   return (
-    <div style={{ margin: 24, padding: 16, border: "1px solid #ccc", borderRadius: 8 }}>
+    <div
+      style={{
+        margin: 24,
+        padding: 16,
+        border: "1px solid #ccc",
+        borderRadius: 8,
+      }}
+    >
       <h2>Upload Video lên Mux</h2>
       {!isUploaded ? (
         <>
-          <input type="file" accept="video/*" onChange={handleFileChange} disabled={uploading} />
-          <button onClick={handleUpload} disabled={uploading || !file} style={{ marginLeft: 8 }}>
+          <input
+            type="file"
+            accept="video/*"
+            onChange={handleFileChange}
+            disabled={uploading}
+          />
+          <button
+            onClick={handleUpload}
+            disabled={uploading || !file}
+            style={{ marginLeft: 8 }}
+          >
             {uploading ? "Đang upload..." : "Upload"}
           </button>
         </>

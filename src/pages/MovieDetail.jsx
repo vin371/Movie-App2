@@ -132,21 +132,70 @@ const MovieDetail = () => {
       <div style={{ color: "#e74c3c", padding: 40 }}>Không tìm thấy phim!</div>
     );
 
+  // Responsive styles
+  const isMobile = window.matchMedia("(max-width: 700px)").matches;
+  const detailStyles = {
+    container: {
+      minHeight: "100vh",
+      background: `linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.85)), url(${getImageUrl(
+        movie.backdrop_path || movie.poster_path,
+        "w780"
+      )}) center/cover no-repeat`,
+      color: "#fff",
+      display: "flex",
+      flexDirection: isMobile ? "column" : "row",
+      alignItems: isMobile ? "flex-start" : "center",
+      padding: isMobile ? "16px" : "60px",
+      gap: isMobile ? "24px" : "60px",
+    },
+    img: {
+      width: isMobile ? "100%" : 320,
+      maxWidth: 400,
+      borderRadius: 16,
+      boxShadow: "0 8px 40px rgba(0,0,0,0.5)",
+      background: "#222",
+      margin: isMobile ? "0 auto" : undefined,
+      display: "block",
+    },
+    info: {
+      maxWidth: isMobile ? "100%" : 600,
+      width: "100%",
+    },
+    title: {
+      fontSize: isMobile ? 24 : 40,
+      marginBottom: 20,
+      wordBreak: "break-word",
+    },
+    rating: {
+      fontSize: isMobile ? 16 : 22,
+      marginBottom: 20,
+    },
+    overview: {
+      fontSize: isMobile ? 14 : 18,
+      marginBottom: 30,
+      wordBreak: "break-word",
+    },
+    btnRow: {
+      display: "flex",
+      gap: isMobile ? 8 : 12,
+      flexWrap: isMobile ? "wrap" : "nowrap",
+    },
+    videoModal: {
+      width: isMobile ? "100vw" : "90vw",
+      maxWidth: isMobile ? "100vw" : 900,
+      height: isMobile ? 220 : 500,
+    },
+    video: {
+      width: "100%",
+      height: isMobile ? 220 : 500,
+      borderRadius: 12,
+      background: "#000",
+      maxHeight: isMobile ? 220 : 500,
+    },
+  };
+
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: `linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.85)), url(${getImageUrl(
-          movie.backdrop_path || movie.poster_path,
-          "w780"
-        )}) center/cover no-repeat`,
-        color: "#fff",
-        display: "flex",
-        alignItems: "center",
-        padding: 60,
-        gap: 60,
-      }}
-    >
+    <div style={detailStyles.container}>
       <ModalTrailer
         open={openTrailer}
         onClose={() => setOpenTrailer(false)}
@@ -156,20 +205,15 @@ const MovieDetail = () => {
       <img
         src={getImageUrl(movie.poster_path, "w500")}
         alt={movie.title}
-        style={{
-          width: 320,
-          borderRadius: 16,
-          boxShadow: "0 8px 40px rgba(0,0,0,0.5)",
-          background: "#222",
-        }}
+        style={detailStyles.img}
       />
-      <div style={{ maxWidth: 600 }}>
-        <h1 style={{ fontSize: 40, marginBottom: 20 }}>{movie.title}</h1>
-        <div style={{ fontSize: 22, marginBottom: 20 }}>
+      <div style={detailStyles.info}>
+        <h1 style={detailStyles.title}>{movie.title}</h1>
+        <div style={detailStyles.rating}>
           ⭐ {movie.vote_average} | {movie.release_date}
         </div>
-        <p style={{ fontSize: 18, marginBottom: 30 }}>{movie.overview}</p>
-        <div style={{ display: "flex", gap: 12 }}>
+        <p style={detailStyles.overview}>{movie.overview}</p>
+        <div style={detailStyles.btnRow}>
           {movie.title === "Thám Tử Lừng Danh Conan: Nàng Dâu Halloween" ? (
             <button onClick={() => setOpenVideo(true)}>Xem phim</button>
           ) : (

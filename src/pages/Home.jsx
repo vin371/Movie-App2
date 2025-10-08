@@ -36,40 +36,51 @@ const Home = ({ hotMovies: appHotMovies }) => {
     };
 
     loadData();
-  }, []);
+  }, [setPopularPeople]);
 
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 700);
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 700);
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+    handleResize();
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+    };
+  }, []);
   const homeStyles = {
     container: {
-      padding: "40px 20px",
-      textAlign: "center",
-      maxWidth: "1400px",
+      padding: isMobile ? "16px 4px" : "40px 20px",
+      textAlign: isMobile ? "left" : "center",
+      maxWidth: isMobile ? "100vw" : "1400px",
       margin: "0 auto",
     },
     welcomeSection: {
-      marginBottom: "60px",
+      marginBottom: isMobile ? "24px" : "60px",
     },
     welcomeTitle: {
       color: "#333",
-      fontSize: "2.5rem",
+      fontSize: isMobile ? "1.5rem" : "2.5rem",
       marginBottom: "20px",
       fontWeight: "bold",
     },
     welcomeText: {
       color: "#666",
-      fontSize: "1.2rem",
+      fontSize: isMobile ? "1rem" : "1.2rem",
       lineHeight: "1.6",
-      maxWidth: "600px",
-      margin: "0 auto",
+      maxWidth: isMobile ? "100vw" : "600px",
+      margin: isMobile ? "0" : "0 auto",
     },
     sectionsContainer: {
-      textAlign: "left",
+      textAlign: isMobile ? "left" : "left",
     },
     loadingContainer: {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      height: "200px",
-      fontSize: "18px",
+      height: isMobile ? "120px" : "200px",
+      fontSize: isMobile ? "1rem" : "18px",
       color: "#666",
     },
   };
