@@ -11,7 +11,7 @@ function UploadPage() {
   const [assetId, setAssetId] = useState("");
   const [playbackUrl, setPlaybackUrl] = useState("");
   const [uploading, setUploading] = useState(false);
-  const [uploadedVideo, setUploadedVideo] = useState(null);
+  // const [uploadedVideo, setUploadedVideo] = useState(null); // Không dùng
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -20,7 +20,11 @@ function UploadPage() {
   const [progress, setProgress] = useState(0);
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
-  const [toast, setToast] = useState({ visible: false, type: 'success', message: '' });
+  const [toast, setToast] = useState({
+    visible: false,
+    type: "success",
+    message: "",
+  });
   const lastPlaybackIdRef = useRef("");
   const [addedMap, setAddedMap] = useState({});
   const navigate = useNavigate();
@@ -28,89 +32,93 @@ function UploadPage() {
   // Restore last successful upload on reload
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('lastUpload');
+      const raw = localStorage.getItem("lastUpload");
       if (raw) {
         const saved = JSON.parse(raw);
         if (saved?.playbackUrl) setPlaybackUrl(saved.playbackUrl);
         if (saved?.assetId) setAssetId(saved.assetId);
       }
-    } catch {}
+    } catch {
+      // Lỗi khi đọc localStorage, bỏ qua
+    }
     try {
-      const rawMap = localStorage.getItem('customMovieVideos');
+      const rawMap = localStorage.getItem("customMovieVideos");
       setAddedMap(rawMap ? JSON.parse(rawMap) : {});
-    } catch { setAddedMap({}); }
+    } catch {
+      setAddedMap({});
+    }
   }, []);
 
   // Simple UI styles
   const styles = {
     page: {
       padding: 32,
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%)',
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%)",
     },
     card: {
       maxWidth: 920,
-      margin: '0 auto',
-      background: '#fff',
+      margin: "0 auto",
+      background: "#fff",
       borderRadius: 16,
       padding: 24,
-      boxShadow: '0 12px 30px rgba(0,0,0,0.08)'
+      boxShadow: "0 12px 30px rgba(0,0,0,0.08)",
     },
     title: {
       fontSize: 28,
       fontWeight: 800,
-      color: '#1f2937',
+      color: "#1f2937",
       marginBottom: 16,
     },
     row: {
-      display: 'flex',
+      display: "flex",
       gap: 12,
-      alignItems: 'center'
+      alignItems: "center",
     },
     btnPrimary: {
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      color: '#fff',
-      border: 'none',
-      padding: '10px 16px',
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      color: "#fff",
+      border: "none",
+      padding: "10px 16px",
       borderRadius: 10,
-      cursor: 'pointer',
-      boxShadow: '0 6px 18px rgba(118,75,162,0.25)'
+      cursor: "pointer",
+      boxShadow: "0 6px 18px rgba(118,75,162,0.25)",
     },
     btnGhost: {
-      background: 'rgba(0,0,0,0.04)',
-      color: '#111827',
-      border: '1px solid rgba(0,0,0,0.08)',
-      padding: '10px 16px',
+      background: "rgba(0,0,0,0.04)",
+      color: "#111827",
+      border: "1px solid rgba(0,0,0,0.08)",
+      padding: "10px 16px",
       borderRadius: 10,
-      cursor: 'pointer'
+      cursor: "pointer",
     },
     progressWrap: {
-      width: '100%',
+      width: "100%",
       maxWidth: 520,
       height: 10,
-      background: '#eef2ff',
+      background: "#eef2ff",
       borderRadius: 999,
-      overflow: 'hidden',
-      border: '1px solid #e5e7eb'
+      overflow: "hidden",
+      border: "1px solid #e5e7eb",
     },
     progressBar: (p) => ({
       width: `${p}%`,
-      height: '100%',
-      background: 'linear-gradient(90deg, #60a5fa, #6366f1)',
-      transition: 'width .2s ease',
+      height: "100%",
+      background: "linear-gradient(90deg, #60a5fa, #6366f1)",
+      transition: "width .2s ease",
     }),
     toast: (type) => ({
-      position: 'fixed',
+      position: "fixed",
       top: 20,
       right: 20,
-      padding: '12px 16px',
+      padding: "12px 16px",
       borderRadius: 10,
-      color: type === 'error' ? '#991b1b' : '#065f46',
-      background: type === 'error' ? '#fee2e2' : '#d1fae5',
-      border: `1px solid ${type === 'error' ? '#fecaca' : '#a7f3d0'}`,
-      boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-      zIndex: 10000
-    })
+      color: type === "error" ? "#991b1b" : "#065f46",
+      background: type === "error" ? "#fee2e2" : "#d1fae5",
+      border: `1px solid ${type === "error" ? "#fecaca" : "#a7f3d0"}`,
+      boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+      zIndex: 10000,
+    }),
   };
 
   // Attach HLS when playbackUrl available
@@ -126,51 +134,63 @@ function UploadPage() {
     }
 
     const autoPlay = () => {
-      try { video.play().catch(() => {}); } catch {}
+      try {
+        video.play().catch(() => {});
+      } catch {
+        // Lỗi khi auto play video, bỏ qua
+      }
     };
 
     if (Hls.isSupported()) {
       const hls = new Hls({
         // Listen for 412 and retry with signed URL
-        xhrSetup: (xhr, url) => {
+        xhrSetup: (xhr) => {
           const onReadyStateChange = () => {
             if (xhr.readyState === 4 && xhr.status === 412) {
               const trySignedByPlayback = async () => {
                 try {
-                  const r = await fetch(`http://localhost:5000/api/mux-signed-playback/${lastPlaybackIdRef.current}`);
+                  const r = await fetch(
+                    `http://localhost:5000/api/mux-signed-playback/${lastPlaybackIdRef.current}`
+                  );
                   if (!r.ok) return;
                   const j = await r.json();
                   if (j.playbackUrl) setPlaybackUrl(j.playbackUrl);
-                } catch {}
+                } catch {
+                  // Lỗi khi gọi API signed playback, bỏ qua
+                }
               };
               const trySignedByAsset = async () => {
                 try {
-                  const r = await fetch(`http://localhost:5000/api/mux-signed-playback-by-asset/${assetId}`);
+                  const r = await fetch(
+                    `http://localhost:5000/api/mux-signed-playback-by-asset/${assetId}`
+                  );
                   if (!r.ok) return;
                   const j = await r.json();
                   if (j.playbackUrl) {
                     setPlaybackUrl(j.playbackUrl);
                     if (j.playbackId) lastPlaybackIdRef.current = j.playbackId;
                   }
-                } catch {}
+                } catch {
+                  // Lỗi khi gọi API signed playback by asset, bỏ qua
+                }
               };
               if (lastPlaybackIdRef.current) trySignedByPlayback();
               else if (assetId) trySignedByAsset();
             }
           };
-          xhr.addEventListener('readystatechange', onReadyStateChange);
+          xhr.addEventListener("readystatechange", onReadyStateChange);
         },
       });
       hlsRef.current = hls;
       hls.loadSource(playbackUrl);
       hls.attachMedia(video);
-      video.addEventListener('canplay', autoPlay, { once: true });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.addEventListener("canplay", autoPlay, { once: true });
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = playbackUrl;
-      video.addEventListener('canplay', autoPlay, { once: true });
+      video.addEventListener("canplay", autoPlay, { once: true });
     } else {
       video.src = playbackUrl;
-      video.addEventListener('canplay', autoPlay, { once: true });
+      video.addEventListener("canplay", autoPlay, { once: true });
     }
 
     return () => {
@@ -181,10 +201,10 @@ function UploadPage() {
     };
   }, [playbackUrl, assetId]);
 
-  const handleVideoUploaded = (fileName, playbackUrl) => {
-    setUploadedVideo({ fileName, playbackUrl });
-    setShowSearch(true);
-  };
+  // const handleVideoUploaded = (fileName, playbackUrl) => {
+  //   setUploadedVideo({ fileName, playbackUrl });
+  //   setShowSearch(true);
+  // };
 
   const handleSearch = async () => {
     if (!searchQuery) return;
@@ -202,7 +222,7 @@ function UploadPage() {
         }
       );
       if (!res.ok) {
-        alert("Lỗi khi gọi TMDB API! Kiểm tra lại API Key.")
+        alert("Lỗi khi gọi TMDB API! Kiểm tra lại API Key.");
         return;
       }
       const data = await res.json();
@@ -224,7 +244,7 @@ function UploadPage() {
     setSelectedMovie({ ...confirmMovie, videoUrl: playbackUrl });
     // Persist to localStorage: map movieId -> { playbackUrl, assetId, playbackId }
     try {
-      const key = 'customMovieVideos';
+      const key = "customMovieVideos";
       const raw = localStorage.getItem(key);
       const map = raw ? JSON.parse(raw) : {};
       map[String(confirmMovie.id)] = {
@@ -234,12 +254,20 @@ function UploadPage() {
       };
       localStorage.setItem(key, JSON.stringify(map));
       setAddedMap(map);
-      setToast({ visible: true, type: 'success', message: 'Thêm video vào phim thành công!' });
+      setToast({
+        visible: true,
+        type: "success",
+        message: "Thêm video vào phim thành công!",
+      });
       // Điều hướng xem ngay
       navigate(`/watch/${confirmMovie.id}`);
     } catch (e) {
-      console.warn('Lưu custom video vào localStorage thất bại:', e);
-      setToast({ visible: true, type: 'error', message: 'Thêm thất bại! Vui lòng thử lại.' });
+      console.warn("Lưu custom video vào localStorage thất bại:", e);
+      setToast({
+        visible: true,
+        type: "error",
+        message: "Thêm thất bại! Vui lòng thử lại.",
+      });
     }
     setConfirmMovie(null);
     setTimeout(() => setToast((t) => ({ ...t, visible: false })), 3000);
@@ -257,13 +285,17 @@ function UploadPage() {
     setShowSearch(false);
     setSelectedMovie(null);
     setConfirmMovie(null);
-    try { localStorage.removeItem('lastUpload'); } catch {}
+    try {
+      localStorage.removeItem("lastUpload");
+    } catch {
+      // Lỗi khi xóa localStorage, bỏ qua
+    }
     if (hlsRef.current) {
       hlsRef.current.destroy();
       hlsRef.current = null;
     }
     if (videoRef.current) {
-      videoRef.current.removeAttribute('src');
+      videoRef.current.removeAttribute("src");
       videoRef.current.load();
     }
   };
@@ -271,73 +303,32 @@ function UploadPage() {
   // Hàm upload video lên Mux (với progress)
   const handleUpload = async (file) => {
     const formData = new FormData();
-    formData.append('video', file); // 'video' phải trùng với BE
+    formData.append("video", file); // 'video' phải trùng với BE
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/mux-upload`, {
-        method: 'POST',
+        method: "POST",
         body: formData,
       });
       const data = await res.json();
-      console.log('Upload response:', data);
-      if (data.error) alert('Upload lỗi: ' + data.error);
-      else alert('Upload thành công: ' + data.filename);
+      console.log("Upload response:", data);
+      if (data.error) alert("Upload lỗi: " + data.error);
+      else alert("Upload thành công: " + data.filename);
     } catch (err) {
-      console.error('Upload error:', err);
-      alert('Upload lỗi: ' + err.message);
+      console.error("Upload error:", err);
+      alert("Upload lỗi: " + err.message);
     }
-  }
+  };
 
   // Polling asset status with fallback to assetId if provided by server
-  async function pollPlaybackUrl(id) {
-    let tries = 0;
-    const maxTries = 40;
-    let useAsset = false;
-    let currentId = id;
-
-    const interval = setInterval(async () => {
-      tries++;
-      try {
-        const url = useAsset
-          ? `http://localhost:5000/api/mux-playback-by-asset/${currentId}`
-          : `http://localhost:5000/api/mux-playback/${currentId}`;
-        const res = await fetch(url);
-        if (!res.ok) {
-          const txt = await res.text();
-          console.warn("Playback resolve failed:", res.status, txt);
-        }
-        const data = await res.json().catch(() => ({}));
-        if (data.playbackUrl) {
-          setPlaybackUrl(data.playbackUrl);
-          if (data.assetId) setAssetId(data.assetId);
-          if (data.playbackId) lastPlaybackIdRef.current = data.playbackId;
-          try { localStorage.setItem('lastUpload', JSON.stringify({ assetId: data.assetId || assetId, playbackUrl: data.playbackUrl })); } catch {}
-          clearInterval(interval);
-          setUploading(false);
-          return;
-        }
-        // If server revealed assetId, switch to resolving by asset
-        if (!useAsset && data.assetId) {
-          useAsset = true;
-          currentId = data.assetId;
-        }
-      } catch (err) {
-        console.log("Lỗi lấy playbackUrl:", err);
-      }
-      if (tries >= maxTries) {
-        console.log("Quá số lần thử, không lấy được playbackUrl");
-        clearInterval(interval);
-        setUploading(false);
-      }
-    }, 3000);
-  }
+  // async function pollPlaybackUrl(id) {
+  //   ...hàm không dùng, đã bỏ
+  // }
 
   return (
     <div style={styles.page}>
       {toast.visible && (
-        <div style={styles.toast(toast.type)}>
-          {toast.message}
-        </div>
+        <div style={styles.toast(toast.type)}>{toast.message}</div>
       )}
       <div style={styles.card}>
         <div style={styles.title}>Upload Video</div>
@@ -345,30 +336,46 @@ function UploadPage() {
           <input
             type="file"
             accept="video/*"
-            onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
+            onChange={(e) =>
+              e.target.files?.[0] && handleUpload(e.target.files[0])
+            }
           />
-          <button onClick={resetUpload} style={styles.btnGhost}>Hủy</button>
+          <button onClick={resetUpload} style={styles.btnGhost}>
+            Hủy
+          </button>
         </div>
         {uploading && (
           <div style={{ marginTop: 16 }}>
-            <p style={{ margin: '6px 0', color: '#374151' }}>Đang xử lý video...</p>
+            <p style={{ margin: "6px 0", color: "#374151" }}>
+              Đang xử lý video...
+            </p>
             <div style={styles.progressWrap}>
               <div style={styles.progressBar(progress)} />
             </div>
-            <p style={{ marginTop: 6, color: '#6b7280' }}>{progress}%</p>
+            <p style={{ marginTop: 6, color: "#6b7280" }}>{progress}%</p>
           </div>
         )}
 
         {playbackUrl && !selectedMovie && (
           <div style={{ marginTop: 20 }}>
-            <video ref={videoRef} controls width={600} style={{ background: '#000', borderRadius: 12 }} />
+            <video
+              ref={videoRef}
+              controls
+              width={600}
+              style={{ background: "#000", borderRadius: 12 }}
+            />
           </div>
         )}
 
         {playbackUrl && !showSearch && (
           <div style={{ marginTop: 16 }}>
             <p>Upload thành công! Video đã sẵn sàng.</p>
-            <button onClick={() => setShowSearch(true)} style={styles.btnPrimary}>Tìm phim</button>
+            <button
+              onClick={() => setShowSearch(true)}
+              style={styles.btnPrimary}
+            >
+              Tìm phim
+            </button>
           </div>
         )}
 
@@ -381,9 +388,16 @@ function UploadPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Nhập tên phim..."
-                style={{ marginRight: 8, padding: '10px 12px', borderRadius: 10, border: '1px solid #e5e7eb' }}
+                style={{
+                  marginRight: 8,
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: "1px solid #e5e7eb",
+                }}
               />
-              <button onClick={handleSearch} style={styles.btnPrimary}>Tìm kiếm</button>
+              <button onClick={handleSearch} style={styles.btnPrimary}>
+                Tìm kiếm
+              </button>
             </div>
             <div style={{ marginTop: 16 }}>
               {searchResults.length === 0 && <p>Không có kết quả.</p>}
@@ -413,11 +427,15 @@ function UploadPage() {
                         {movie.title} ({movie.release_date?.slice(0, 4)})
                       </div>
                       <button
-                        style={{ marginTop: 8, width: "100%", ...(already ? {} : styles.btnPrimary) }}
+                        style={{
+                          marginTop: 8,
+                          width: "100%",
+                          ...(already ? {} : styles.btnPrimary),
+                        }}
                         onClick={() => !already && handleAddClick(movie)}
                         disabled={already}
                       >
-                        {already ? 'Đã thêm' : 'Thêm video này vào phim'}
+                        {already ? "Đã thêm" : "Thêm video này vào phim"}
                       </button>
                     </div>
                   );
@@ -454,8 +472,15 @@ function UploadPage() {
                     <b>{confirmMovie.title}</b>?
                   </p>
                   <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-                    <button onClick={handleConfirmAdd} style={styles.btnPrimary}>Đồng ý</button>
-                    <button onClick={handleCancelAdd} style={styles.btnGhost}>Hủy</button>
+                    <button
+                      onClick={handleConfirmAdd}
+                      style={styles.btnPrimary}
+                    >
+                      Đồng ý
+                    </button>
+                    <button onClick={handleCancelAdd} style={styles.btnGhost}>
+                      Hủy
+                    </button>
                   </div>
                 </div>
               </div>

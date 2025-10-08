@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import MovieSection from "../components/MovieSection";
 import PeopleSection from "../components/PeopleSection";
-import {  fetchNominatedMovies } from "../data/movieData";
+import { fetchNominatedMovies } from "../data/movieData";
 import {
   getPopularPeople,
   transformPeopleData,
@@ -9,7 +9,7 @@ import {
 
 const Home = ({ hotMovies: appHotMovies }) => {
   const [nominatedMovies, setNominatedMovies] = useState([]);
-  const [ setPopularPeople] = useState([]);
+  const [setPopularPeople] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -94,23 +94,6 @@ const Home = ({ hotMovies: appHotMovies }) => {
 
   return (
     <div style={homeStyles.container}>
-      <video controls width="800" style={{ marginBottom: "2rem" }}>
-        <source
-          src="https://myvideocpm.b-cdn.net/conan_halloween_fixed.mp4"
-          type="video/mp4"
-        />
-        Your browser does not support the video tag.
-      </video>
-      {/* Welcome Section */}
-      <div style={homeStyles.welcomeSection}>
-        <h1 style={homeStyles.welcomeTitle}>Welcome to CPMV</h1>
-        <p style={homeStyles.welcomeText}>
-          Your ultimate destination for movies and entertainment. Discover the
-          latest films, explore different genres, and find your next favorite
-          movie.
-        </p>
-      </div>
-
       {/* Movie Sections */}
       <div style={homeStyles.sectionsContainer}>
         <MovieSection title="🔥 Phim Hot" movies={appHotMovies || []} />
