@@ -211,7 +211,7 @@ function UploadPage() {
         alert("Không tìm thấy phim nào!");
       }
     } catch (err) {
-      alert("Có lỗi khi tìm kiếm phim!!");
+      alert("Có lỗi khi tìm kiếm phim!!!");
       console.error(err);
     }
   };
