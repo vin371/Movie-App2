@@ -33,14 +33,17 @@ const MovieDetail = () => {
 
   const handleOpenTrailer = async () => {
     const videos = await getMovieVideos(id);
-    const trailer = videos.find(
-      (v) => v.site === "YouTube" && v.type === "Trailer!"
+    // Ưu tiên trailer YouTube, nếu không có thì lấy video đầu tiên
+    let trailer = videos.find(
+      (v) =>
+        v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser")
     );
-    if (trailer) {
+    if (!trailer && videos.length > 0) trailer = videos[0];
+    if (trailer && trailer.site === "YouTube" && trailer.key) {
       setYoutubeKey(trailer.key);
       setOpenTrailer(true);
     } else {
-      alert("Không tìm thấy trailer!!");
+      alert("Không tìm thấy trailer YouTube cho phim này!");
     }
   };
 
@@ -65,7 +68,9 @@ const MovieDetail = () => {
         }
       };
     }, [open]);
+
     if (!open) return null;
+
     return (
       <div
         onClick={(e) => {
@@ -94,24 +99,7 @@ const MovieDetail = () => {
             maxWidth: 900,
           }}
         >
-          <button
-            onClick={onClose}
-            style={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              background: "#fff",
-              border: "none",
-              borderRadius: "50%",
-              width: 32,
-              height: 32,
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
-          >
-            ✖
-          </button>
-          {/* Nếu là phim Conan thì phát video Bunny.net, ngược lại phát YouTube demo */}
+          {/* Nếu là phim Conan thì phát video Bunny.net, hoặc Doraemon */}
           {movie &&
           movie.title === "Thám Tử Lừng Danh Conan: Nàng Dâu Halloween" ? (
             <video
@@ -127,18 +115,22 @@ const MovieDetail = () => {
               />
               Trình duyệt của bạn không hỗ trợ video.
             </video>
-          ) : (
-            <iframe
+          ) : movie &&
+            movie.title === "Thám Tử Lừng Danh Conan: Tiền Đạo Thứ 11" ? (
+            <video
               width="100%"
               height="500"
-              src="https://www.youtube.com/embed/jwS54s9t7gs?autoplay=1&rel=0"
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-              allowFullScreen
-              style={{ borderRadius: 12, background: "#000" }}
-            />
-          )}
+              controls
+              autoPlay
+              style={{ borderRadius: 12, background: "#000", maxHeight: 500 }}
+            >
+              <source
+                src="https://myvideo3.b-cdn.net/Th%C3%A1m%20T%E1%BB%AD%20L%E1%BB%ABng%20Danh%20Conan%2016-%20Ti%E1%BB%81n%20%C4%90%E1%BA%A1o%20Th%E1%BB%A9%2011%20-%20Detective%20Conan%20Movie%2016-%20The%20Eleventh%20Striker.mp4"
+                type="video/mp4"
+              />
+              Trình duyệt của bạn không hỗ trợ video.
+            </video>
+          ) : null}
         </div>
       </div>
     );
@@ -199,18 +191,6 @@ const MovieDetail = () => {
       gap: isMobile ? 8 : 12,
       flexWrap: isMobile ? "wrap" : "nowrap",
     },
-    videoModal: {
-      width: isMobile ? "100vw" : "90vw",
-      maxWidth: isMobile ? "100vw" : 900,
-      height: isMobile ? 220 : 500,
-    },
-    video: {
-      width: "100%",
-      height: isMobile ? 220 : 500,
-      borderRadius: 12,
-      background: "#000",
-      maxHeight: isMobile ? 220 : 500,
-    },
   };
 
   return (
@@ -233,7 +213,8 @@ const MovieDetail = () => {
         </div>
         <p style={detailStyles.overview}>{movie.overview}</p>
         <div style={detailStyles.btnRow}>
-          {movie.title === "Thám Tử Lừng Danh Conan: Nàng Dâu Halloween" ? (
+          {movie.title === "Thám Tử Lừng Danh Conan: Nàng Dâu Halloween" ||
+          movie.title === "Thám Tử Lừng Danh Conan: Tiền Đạo Thứ 11" ? (
             <button onClick={() => setOpenVideo(true)}>Xem phim</button>
           ) : (
             <button onClick={() => navigate(`/watch/${movie.id}`)}>

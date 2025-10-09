@@ -32,8 +32,7 @@ const SearchResults = () => {
       setQuery(searchQuery);
       performSearch(searchQuery);
     }
-  }, [location.search]); // Nếu muốn fix lint, chuyển performSearch thành useCallback
-
+  }, [location.search]);
   // Hàm loại bỏ dấu tiếng Việt
   function removeVietnameseTones(str) {
     return str
